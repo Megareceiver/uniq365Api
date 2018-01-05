@@ -7,16 +7,19 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require '../vendor/autoload.php';
 require 'config/database.php';
 
-$app = new \Slim\App;
-$app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-
-    return $response;
-});
+// $app = new \Slim\App;
+// $app->get('/hello/{name}', function (Request $request, Response $response, array $args) {
+//     $name = $args['name'];
+//     $response->getBody()->write("Hello, $name");
+//
+//     return $response;
+// });
 
 // Membership router
 require 'membership/main.php';
+
+// Uniq router
+require 'uniq/main.php';
 
 $app->run();
 

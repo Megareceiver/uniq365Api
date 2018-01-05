@@ -5,7 +5,7 @@
   class db {
     function __construct()
     {
-      
+
     }
 
     public function connection($connection_select){
@@ -23,15 +23,15 @@
           $connection->dbhost = 'localhost';
           $connection->dbuser = 'root';
           $connection->dbpass = 'root';
-          $connection->dbname = 'uniq356_system';
+          $connection->dbname = 'uniq365_system';
         break;
 
         case 'membership':
           // Membership connection
-          #$connection->dbhost = 'localhost';
-          #$connection->dbuser = 'root';
-          #$connection->dbpass = 'root';
-          #$connection->dbname = '';
+          $connection->dbhost = 'localhost';
+          $connection->dbuser = 'root';
+          $connection->dbpass = 'root';
+          $connection->dbname = 'uniq365_membership';
         break;
 
         case 'helpdesk':
