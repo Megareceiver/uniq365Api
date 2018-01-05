@@ -52,7 +52,6 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
     }
 
     echo json_encode($refactor);
-    // echo ($result[0]->id_modules_sub);
 
   } catch(PDOException $e) {
     echo '{"error": {"text": '.$e->getMessage().'}}';

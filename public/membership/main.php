@@ -17,6 +17,10 @@ $app = new \Slim\App;
 // Get All Module list
 $app->get($section.'/modules', function(Request $request, Response $response){
   try {
+    // Get database object & connect
+    $db = new db();
+    $db = $db->connect('system');
+
     $sql =
     "SELECT s.id as `id`, m.name as `module`, g.name as `group`, s.name as `name`
     FROM modules_sub s
@@ -24,11 +28,6 @@ $app->get($section.'/modules', function(Request $request, Response $response){
     JOIN modules_group g ON s.id_modules_group = g.id
     ORDER BY m.sequence, g.sequence, s.id ASC
     ";
-
-    // Get database object
-    $db = new db();
-    // connect
-    $db = $db->connect('system');
 
     //statement
     $statement = $db->query($sql);
