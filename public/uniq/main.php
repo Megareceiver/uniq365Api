@@ -12,7 +12,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $section = "/uniq";
-$app = new \Slim\App;
 
 // Get All Modules list depends on the company's chosen plan
 $app->get($section.'/modules/{company_id}', function(Request $request, Response $response, array $args){
@@ -46,12 +45,29 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
 
     $refactor = array();
     for($loop=0;$loop<count($result);$loop++){
+      if(!isset($refactor[$result[$loop]->module]['status']))
+        $refactor[$result[$loop]->module]['status'] = 0;
+
+      if(!isset($refactor[$result[$loop]->module][$result[$loop]->group]['status']))
+        $refactor[$result[$loop]->module][$result[$loop]->group]['status'] = 0;
+
+      $refactor[$result[$loop]->module]['status'] += (int)$refactor[$result[$loop]->module][$result[$loop]->group]['status'];
+      $refactor[$result[$loop]->module][$result[$loop]->group]['status'] += (int)$result[$loop]->active;
       $refactor[$result[$loop]->module][$result[$loop]->group][$loop]['id'] = $result[$loop]->id;
       $refactor[$result[$loop]->module][$result[$loop]->group][$loop]['name'] = $result[$loop]->name;
       $refactor[$result[$loop]->module][$result[$loop]->group][$loop]['active'] = $result[$loop]->active;
+
+      if($refactor[$result[$loop]->module]['status'] > 1)
+      $refactor[$result[$loop]->module]['status'] = 1;
+
+      if($refactor[$result[$loop]->module][$result[$loop]->group]['status'] > 1)
+        $refactor[$result[$loop]->module][$result[$loop]->group]['status'] = 1;
     }
 
+
     echo json_encode($refactor);
+    // echo json_encode(array_count_values($refactor['SALES']['OPERATIONS']));
+
 
   } catch(PDOException $e) {
     echo '{"error": {"text": '.$e->getMessage().'}}';

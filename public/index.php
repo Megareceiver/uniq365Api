@@ -7,6 +7,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
 require '../vendor/autoload.php';
 require 'config/database.php';
 
+$app = new \Slim\App;
+
 // Membership router
 require 'membership/main.php';
 

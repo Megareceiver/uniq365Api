@@ -12,7 +12,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
 $section = "/membership";
-$app = new \Slim\App;
 
 // Get All Module list
 $app->get($section.'/modules', function(Request $request, Response $response){
