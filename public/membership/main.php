@@ -45,3 +45,59 @@ $app->get($section.'/modules', function(Request $request, Response $response){
     echo '{"error": {"text": '.$e->getMessage().'}}';
   }
 });
+
+// Set New Account Book
+$app->get($section.'/new/accountbook/{company_id}', function(Request $request, Response $response, array $args){
+  try {
+    // Catch arguments
+    $company_id = $args['company_id'];
+    $filename = config_path.$company_id.".php";
+    if (!file_exists($filename)) {
+      // Get database object & connect
+      $control   = new db();
+      $db        = $control->connect();
+      $config    = $control->connection_config($company_id);
+      $newdb     = database_prefix.$company_id;
+
+      //Create new database
+      $sql       = "CREATE DATABASE ".$newdb;
+      $statement = $db->exec($sql);
+      // $statement = true;
+
+      if($statement){
+        $response = $control->clone_database($newdb);
+        $db = null;
+        // Create account book config
+        write_config($filename, $config);
+        echo '{"result": {"text": "New Account Book has been created"}}';
+      }else{
+        echo '{"error": {"text": "There was an error during create new database!"}}';
+      }
+    }else{
+      echo '{"error": {"text": "Account Book Already Exists!"}}';
+    }
+
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
+
+
+// function to create file config account book
+function write_config($filename, $config) {
+    $fh = fopen($filename, "w");
+    if (!is_resource($fh)) {
+        return false;
+    }
+
+    fwrite($fh, '<?php '.$config.' ?>');
+    fclose($fh);
+
+    return true;
+}
+
+#function read_config($filename) {
+#    return parse_ini_file($filename, false, INI_SCANNER_NORMAL);
+#}
+
+?>
