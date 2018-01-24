@@ -64,7 +64,6 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
         $refactor[$result[$loop]->module][$result[$loop]->group]['status'] = 1;
     }
 
-
     echo json_encode($refactor);
     // echo json_encode(array_count_values($refactor['SALES']['OPERATIONS']));
 

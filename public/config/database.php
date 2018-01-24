@@ -8,7 +8,7 @@
 
     }
 
-    public function connection($connection_select){
+    public function connection($connection_select, $database_select = ""){
       // Properties
       $connection = new StdClass();
       $connection->dbhost = 'localhost';
@@ -44,10 +44,10 @@
 
         case 'uniq':
           // Uniq connection
-          #$connection->dbhost = 'localhost';
-          #$connection->dbuser = 'root';
-          #$connection->dbpass = 'root';
-          #$connection->dbname = '';
+          $connection->dbhost = 'localhost';
+          $connection->dbuser = 'root';
+          $connection->dbpass = 'root';
+          $connection->dbname = 'uniq365_'.$database_select;
         break;
 
       }
@@ -67,8 +67,8 @@
     }
 
     // Connect
-    public function connect($connection_select = ""){
-      $connection = $this->connection($connection_select);
+    public function connect($connection_select = "", $database_select = ""){
+      $connection = $this->connection($connection_select, $database_select);
       $selectdata = ($connection->dbname != "" ? "dbname=$connection->dbname;" : "");
 
       $mysql_connect_str = "mysql:host=$connection->dbhost;".$selectdata;
@@ -85,7 +85,7 @@
         $active_record = TRUE;
         $db["'.$company_id.'"] = array(
         	"hostname"=>"localhost",
-        	"database"=>"'database_prefix.$company_id.'",
+        	"database"=>"'.database_prefix.$company_id.'",
         	"username"=>"uniq",
         	"password"=>"B@ndung123",
         	"dbdriver"=>"mysql",
