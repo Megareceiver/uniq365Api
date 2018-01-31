@@ -72,3 +72,32 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
     echo '{"error": {"text": '.$e->getMessage().'}}';
   }
 });
+
+$app->get($section.'/activeusers/{company_id}', function(Request $request, Response $response, array $args){
+  try {
+    // Catch arguments
+    $company_id    = $args['company_id'];
+    // Get database object
+    $db            = new db();
+    $db            = $db->connect('membership');
+
+    // STEP 1 ------------------------------------------------------------------
+    // Get all sub modules id on chosen plan
+    $sql =
+    "SELECT userquota
+     FROM users u
+     JOIN payment_plans pm ON u.premium_planid = pm.id
+     WHERE u.username = '$company_id'
+     ";
+
+    //statement
+    $statement = $db->query($sql);
+    $result = $statement->fetch(PDO::FETCH_OBJ);
+    $db = null;
+
+    echo json_encode($result);
+
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
