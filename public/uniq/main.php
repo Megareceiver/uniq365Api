@@ -30,13 +30,14 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
     // Get all sub modules id on chosen plan
     $sql =
     "SELECT s.id as `id`, m.name as `module`, g.name as `group`, s.name as `name`, pm.active as active
-     FROM ".$membership_db->dbname.".users u
+     FROM ".$membership_db->dbname.".customer c
+     JOIN ".$membership_db->dbname.".users_as a ON c.id = a.customer_id
+     JOIN ".$membership_db->dbname.".users u ON a.id = u.id
      JOIN ".$membership_db->dbname.".payment_plan_modules pm ON u.premium_planid = pm.plan_id
      JOIN ".$system_db->dbname.".modules_sub s ON pm.module_id = s.id
      JOIN ".$system_db->dbname.".modules m ON s.id_modules = m.id
      JOIN ".$system_db->dbname.".modules_group g ON s.id_modules_group = g.id
-     WHERE u.username = '$company_id'
-     ";
+     WHERE c.company_id = '$company_id'";
 
     //statement
     $statement = $db->query($sql);
