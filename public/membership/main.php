@@ -112,16 +112,37 @@ $app->get($section.'/register/{code}', function(Request $request, Response $resp
     $username	= $explodedata[1];
     $password	= $explodedata[2];
 
+    $db = new db();
+    $db = $db->connect('membership');
 
-      // update username and password
-      $control   = new db();
-      $db        = $control->connect('uniq',$company_id);
-      $config    = $control->connection_config($company_id);
+    $sql =
+    "SELECT c.name, c.address, c.phone, c.fax, u.email, co.name as country, c.registrasion_number FROM
+    customer c JOIN
+    users_as a ON c.id = a.customer_id JOIN
+    users u ON a.id = u.id JOIN
+    countries co ON c.country_id = co.id
+    WHERE company_id ='".$company_id."'";
 
+    $statement = $db->query($sql);
+    $result = $statement->fetch(PDO::FETCH_OBJ);
+    $db = null;
 
-      $sql       = "UPDATE users SET user_id='".$username."' ,password='".$password."' WHERE user_id='admin'";
-      $statement = $db->exec($sql);
+    // update username and password
+    $control   = new db();
+    $db        = $control->connect('uniq',$company_id);
+    $config    = $control->connection_config($company_id);
 
+    $sql        = "UPDATE users SET user_id='".$username."' ,password='".$password."' WHERE user_id='admin';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->address."' WHERE name='postal_address';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->phone."' WHERE name='phone';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->fax."' WHERE name='fax';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->name."' WHERE name='coy_name';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->email."' WHERE name='email';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->country."' WHERE name='domicile';";
+    $sql       .= "UPDATE sys_prefs SET value='".$result->registrasion_number."' WHERE name='coy_no';";
+    $statement = $db->exec($sql);
+
+    echo '{"result": {"text": "New Account Book has been updated"}}';
 
   } catch(PDOException $e) {
     echo '{"error": {"text": '.$e->getMessage().'}}';
