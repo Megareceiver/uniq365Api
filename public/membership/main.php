@@ -101,39 +101,27 @@ function write_config($filename, $config) {
 #}
 
 //function to update uniq user auth from membership
-// Set New Account Book
-$app->get($section.'/new/accountbook', function(Request $request, Response $response, array $args){
+// Set system pref
+$app->get($section.'/register/{code}', function(Request $request, Response $response, array $args){
   try {
-    // Catch arguments
-    $post       = $request->getParsedBody();
-    $company_id = filter_var($post['company_id'], FILTER_SANITIZE_STRING);
-    $username   = filter_var($post['username'], FILTER_SANITIZE_STRING);
-    $password   = filter_var($post['password'], FILTER_SANITIZE_STRING);
 
-    if (!file_exists($filename)) {
-      // Get database object & connect
+    $data = $args['code'];
+    $explodedata = explode(",",$data);
+
+    $company_id = $explodedata[0];
+    $username	= $explodedata[1];
+    $password	= $explodedata[2];
+
+
+      // update username and password
       $control   = new db();
-      $db        = $control->connect('uniq');
+      $db        = $control->connect('uniq',$company_id);
       $config    = $control->connection_config($company_id);
-      $newdb     = database_prefix.$company_id;
 
-      //Create new database
-      $sql       = "";
+
+      $sql       = "UPDATE users SET user_id='".$username."' ,password='".$password."' WHERE user_id='admin'";
       $statement = $db->exec($sql);
-      // $statement = true;
 
-      if($statement){
-        $response = $control->clone_database($newdb);
-        $db = null;
-        // Create account book config
-        write_config($filename, $config);
-        echo '{"result": {"text": "New Account Book has been created"}}';
-      }else{
-        echo '{"error": {"text": "There was an error during create new database!"}}';
-      }
-    }else{
-      echo '{"error": {"text": "Account Book Already Exists!"}}';
-    }
 
   } catch(PDOException $e) {
     echo '{"error": {"text": '.$e->getMessage().'}}';
