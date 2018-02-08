@@ -104,3 +104,61 @@ $app->get($section.'/activeusers/{company_id}', function(Request $request, Respo
     echo '{"error": {"text": '.$e->getMessage().'}}';
   }
 });
+
+$app->post($section.'/accountbook/list', function(Request $request, Response $response){
+  try {
+    // Catch arguments
+    $data        = $request->getParsedBody();
+    $username    = $data['username'];
+    $password    = $data['password'];
+    // $password    = base64_decode($data['password']);
+
+
+    // Get database object
+    $db            = new db();
+    $db            = $db->connect('membership');
+
+    // STEP 1 ------------------------------------------------------------------
+    // Get user identity
+    $sql =
+    " SELECT u.username, u.password FROM users u
+      WHERE
+      u.username = '".$username."'
+     ";
+
+    //statement
+    $statement = $db->query($sql);
+    $result = $statement->fetch(PDO::FETCH_OBJ);
+
+    if($result->username && $result->password){
+      $phpass = new passwordhash(12, false);
+      if (!$phpass->CheckPassword($password, $result->password)) {
+          echo '{"error": {"text": "Invalid login!"}}';
+          return false;
+      }
+
+      // STEP 2 ------------------------------------------------------------------
+      // Get accountbook
+      $sql =
+      " SELECT c.name, c.company_id as id FROM
+        partners p
+        JOIN users_as a ON p.id = a.partner_id
+        JOIN customer c ON c.partner_id = p.id
+        JOIN users u ON a.id = u.id
+        WHERE
+        u.username = '".$username."' AND c.company_id != ''
+       ";
+
+      //statement
+      $statement = $db->query($sql);
+      $result = $statement->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+
+      echo json_encode($result);
+    }else{
+      echo '{"error": {"text": "Invalid login!"}}';
+    }
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
