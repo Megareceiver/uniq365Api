@@ -98,7 +98,7 @@ $app->get($section.'/activeusers/{company_id}', function(Request $request, Respo
     $result = $statement->fetch(PDO::FETCH_OBJ);
     $db = null;
 
-    echo json_encode($result);
+    echo (int)$result->userquota;
 
   } catch(PDOException $e) {
     echo '{"error": {"text": '.$e->getMessage().'}}';
