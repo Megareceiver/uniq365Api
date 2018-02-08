@@ -111,7 +111,7 @@ $app->post($section.'/accountbook/list', function(Request $request, Response $re
     $data        = $request->getParsedBody();
     $username    = $data['username'];
     $password    = $data['password'];
-    // $password    = base64_decode($data['password']);
+    $password    = base64_decode($password);
 
 
     // Get database object
