@@ -86,9 +86,11 @@ $app->get($section.'/activeusers/{company_id}', function(Request $request, Respo
     // Get all sub modules id on chosen plan
     $sql =
     "SELECT userquota
-     FROM users u
+     FROM customer c JOIN
+     users_as a ON c.id = a.customer_id JOIN
+     users u ON a.id = u.id
      JOIN payment_plans pm ON u.premium_planid = pm.id
-     WHERE u.username = '$company_id'
+     WHERE company_id = '$company_id'
      ";
 
     //statement
