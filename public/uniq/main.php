@@ -37,7 +37,7 @@ $app->get($section.'/modules/{company_id}', function(Request $request, Response 
      JOIN ".$system_db->dbname.".modules_sub s ON pm.module_id = s.id
      JOIN ".$system_db->dbname.".modules m ON s.id_modules = m.id
      JOIN ".$system_db->dbname.".modules_group g ON s.id_modules_group = g.id
-     WHERE c.company_id = '$company_id'";
+     WHERE c.company_id = '$company_id' ORDER BY s.id";
 
     //statement
     $statement = $db->query($sql);
