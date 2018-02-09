@@ -162,3 +162,68 @@ $app->post($section.'/accountbook/list', function(Request $request, Response $re
     echo '{"error": {"text": '.$e->getMessage().'}}';
   }
 });
+
+//function to update uniq user auth from membership
+// Set system pref
+$app->get($section.'/register/new/{code}', function(Request $request, Response $response, array $args){
+  try {
+
+    $data = $args['code'];
+    $explodedata = explode(",",$data);
+
+    $company_id = $explodedata[0];
+    $username	= $explodedata[1];
+    $password	= $explodedata[2];
+
+    $db = new db();
+    $db = $db->connect('membership');
+
+    $sql = "SELECT * FROM users_global WHERE company_id ='".$company_id."' AND username = '".$username."'";
+
+    $statement = $db->query($sql);
+    $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+    if(count($result) == 0){
+      $sql        = "INSERT users_global (username,password,company_id, apps) VALUES ('".$username."' ,'".$password."' ,'".$company_id."', 'UNIQ365');";
+      $statement = $db->exec($sql);
+
+      echo '{"result": {"text": "Account has been successfully registered"}}';
+    }else{
+      echo '{"error": {"text": "Account is already exist!"}}';
+    }
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
+
+$app->get($section.'/register/update/{code}', function(Request $request, Response $response, array $args){
+  try {
+
+    $data = $args['code'];
+    $explodedata = explode(",",$data);
+
+    $company_id = $explodedata[0];
+    $username	= $explodedata[1];
+    $password	= $explodedata[2];
+
+    $db = new db();
+    $db = $db->connect('membership');
+
+    $sql = "SELECT * FROM users_global WHERE company_id ='".$company_id."' AND username = '".$username."'";
+
+    $statement = $db->query($sql);
+    $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+    if(count($result) > 0){
+      $sql        = "UPDATE users_global SET password = '".$password."' WHERE username = '".$username."' AND company_id = '".$company_id."'";
+      $statement = $db->exec($sql);
+
+      echo '{"result": {"text": "Account has been successfully updated"}}';
+    }else{
+      echo '{"error": {"text": "Account is not exist!"}}';
+    }
+
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
