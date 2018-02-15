@@ -227,3 +227,40 @@ $app->get($section.'/register/update/{code}', function(Request $request, Respons
     echo '{"error": {"text": '.$e->getMessage().'}}';
   }
 });
+
+// get company ID from user global
+
+$app->post($section.'/getcompany/', function(Request $request, Response $response, array $args){
+  try {
+
+    // $data = $args['code'];
+    // $explodedata = explode(",",$data);
+    //$company_id = $explodedata[0];
+    // $username = $explodedata[0];
+    // $password = $explodedata[1];
+
+    // Catch arguments
+    $data        = $request->getParsedBody();
+    $username    = $data['username'];
+    $password    = md5($data['password']);
+
+    $db = new db();
+    $db = $db->connect('membership');
+
+    $sql = "SELECT company_id FROM users_global WHERE password ='".$password."' AND username = '".$username."'";
+
+    $statement = $db->query($sql);
+    $result = $statement->fetchAll(PDO::FETCH_OBJ);
+
+    if(count($result) > 0){
+      // $sql        = "UPDATE users_global SET password = '".$password."' WHERE username = '".$username."' AND company_id = '".$company_id."'";
+      // $statement = $db->exec($sql);
+      echo json_encode($result);
+    }else{
+       echo '{"error": {"text": "Invalid login!"}}';
+    }
+
+  } catch(PDOException $e) {
+    echo '{"error": {"text": '.$e->getMessage().'}}';
+  }
+});
